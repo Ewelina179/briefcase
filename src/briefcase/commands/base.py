@@ -158,6 +158,12 @@ class BaseCommand(ABC):
     @property
     def input(self):
         return self.tools.input
+    
+    def set_version(self):
+        pass
+
+    def set_template(self):
+        pass
 
     def validate_data_path(self, data_path):
         """Validate provided data path or determine OS-specific path.
@@ -519,6 +525,9 @@ a custom location for Briefcase's tools.
         self.verify_host()
         self.verify_tools()
 
+        self.set_version()
+        self.set_template()
+
         if app is None:
             for app in self.apps.values():
                 if hasattr(app, "__draft__"):
@@ -701,12 +710,19 @@ a custom location for Briefcase's tools.
         )
 
     def add_options(self, parser):
+        parser.add_argument(
+            "--config",
+            action="append",
+            dest="extra_config_args",
+            help="Additional arguments to override app settings",
+            required=False,
+            nargs="+"
+        )
         """Add any options that this command needs to parse from the command line.
 
         :param parser: a stub argparse parser for the command.
         """
-        pass
-
+        
     def parse_config(self, filename):
         try:
             with open(filename, "rb") as config_file:
